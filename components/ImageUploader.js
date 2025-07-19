@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import React, { useState, useRef, useEffect } from "react"
 
@@ -33,7 +33,13 @@ export default function ImageUploader({ onUploadSuccess }) {
     setCameraError(null);
     setCameraActive(false); // Resetear estado de cámara activa
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      // Modificación clave: solicitar la cámara trasera (environment)
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: { exact: "environment" } // Especifica la cámara trasera
+        },
+        audio: false // No necesitamos audio para esto
+      });
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -49,7 +55,26 @@ export default function ImageUploader({ onUploadSuccess }) {
       if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
         setCameraError("Acceso a la cámara denegado. Por favor, permite el acceso en la configuración de tu navegador.");
       } else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
-        setCameraError("No se encontró ninguna cámara. Asegúrate de que una cámara esté conectada y funcionando.");
+        setCameraError("No se encontró ninguna cámara trasera. Intentando con la cámara frontal o asegúrate de que una cámara esté conectada.");
+        // Opcional: intentar con la cámara frontal si la trasera no se encuentra
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+          streamRef.current = stream;
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+            videoRef.current.onloadedmetadata = () => {
+              videoRef.current.play();
+              setCameraActive(true);
+              setCameraError(null); // Limpiar el error si la frontal funciona
+              console.log("DEBUG: Cámara frontal iniciada como alternativa.");
+            };
+          }
+        } catch (frontErr) {
+          console.error("Error al acceder a la cámara frontal como alternativa:", frontErr);
+          setCameraError("No se encontró ninguna cámara disponible o el acceso fue denegado.");
+          setUseCamera(false);
+          setCameraActive(false);
+        }
       } else {
         setCameraError("Error al iniciar la cámara: " + err.message);
       }
@@ -169,14 +194,20 @@ export default function ImageUploader({ onUploadSuccess }) {
     <div className="p-4 bg-white rounded-xl shadow-md w-full">
       <div className="flex justify-center space-x-4 mb-6">
         <button
-          onClick={() => setUseCamera(false)}
+          onClick={() => {
+            setUseCamera(false);
+            stopCamera(); // Asegúrate de detener la cámara al cambiar de modo
+          }}
           className={`px-4 py-2 rounded-full font-semibold transition-colors duration-200
             ${!useCamera ? "bg-blue-600 text-white shadow-md" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
         >
           Subir Archivo
         </button>
         <button
-          onClick={() => setUseCamera(true)}
+          onClick={() => {
+            setUseCamera(true);
+            // startCamera() se llamará por el useEffect cuando useCamera cambie a true
+          }}
           className={`px-4 py-2 rounded-full font-semibold transition-colors duration-200
             ${useCamera ? "bg-blue-600 text-white shadow-md" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
         >

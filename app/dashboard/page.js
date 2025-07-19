@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import React, { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
@@ -20,6 +20,7 @@ export default function DashboardPage() {
   const [totals, setTotals] = useState({ calories: 0, protein: 0, carbs: 0, fat: 0 });
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [lastAnalyzedMeal, setLastAnalyzedMeal] = useState(null); // Estado para la última comida analizada
+  const [isClient, setIsClient] = useState(false); // Nuevo estado para verificar si estamos en el cliente
 
   // 🔐 Redirigir si no está autenticado
   useEffect(() => {
@@ -34,6 +35,11 @@ export default function DashboardPage() {
       fetchData();
     }
   }, [status]);
+
+  // Efecto para marcar que el componente se ha montado en el cliente
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const fetchData = async () => {
     setIsLoadingData(true);
@@ -148,7 +154,7 @@ export default function DashboardPage() {
                   <li>🔥 Calorías: <span className="font-semibold">{lastAnalyzedMeal.calories}</span> kcal</li>
                   <li>🍗 Proteínas: <span className="font-semibold">{lastAnalyzedMeal.protein}</span> g</li>
                   <li>🍞 Carbohidratos: <span className="font-semibold">{lastAnalyzedMeal.carbs}</span> g</li>
-                  <li>🥑 Grasas: <span className="font-semibold">{lastAnalyAnalyzedMeal.fat}</span> g</li>
+                  <li>🥑 Grasas: <span className="font-semibold">{lastAnalyzedMeal.fat}</span> g</li>
                 </ul>
               </div>
               <div className="flex justify-center items-center">
@@ -217,25 +223,31 @@ export default function DashboardPage() {
                 </svg>
                 <p className="ml-2 sm:ml-3 text-gray-600 text-sm sm:text-base">Generando gráfico...</p>
               </div>
-            ) : macroData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={200}> {/* Eliminado sm:height */}
+            ) : macroData.length > 0 && isClient ? (
+              <ResponsiveContainer width="100%" height={200}>
                 <PieChart>
                   <Pie
                     data={macroData}
                     cx="50%"
                     cy="50%"
-                    outerRadius={70} // Eliminado sm:outerRadius
-                    fill="#8884d8"
+                    outerRadius={70}
+                    // El prop 'fill' debe estar dentro de la etiqueta de apertura de Pie,
+                    // no en su propia línea como si fuera un atributo HTML independiente.
+                    fill="#8884d8" // <-- Aseguramos que este prop esté correctamente dentro de la etiqueta <Pie>
                     dataKey="value"
                     labelLine={false}
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    label={({ name, percent, x, y, cx, cy }) => (
+                      <text x={x} y={y} fill="currentColor" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" className="text-xs sm:text-sm">
+                        {`${name}: ${(percent * 100).toFixed(0)}%`}
+                      </text>
+                    )}
                   >
                     {macroData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
                   <Tooltip formatter={(value) => `${Math.round(value)} kcal`} />
-                  <Legend />
+                  <Legend verticalAlign="bottom" align="center" wrapperStyle={{ paddingTop: '10px' }} />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
