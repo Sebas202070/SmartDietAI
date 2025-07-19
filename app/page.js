@@ -6,38 +6,38 @@ export default function Home() {
   const { status } = useSession();
 
   return (
-    <div className="relative min-h-[calc(100vh-80px)] bg-gradient-to-br from-green-100 via-blue-100 to-purple-100 flex flex-col items-center justify-center text-center px-4 py-16 overflow-hidden">
+    <div className="relative min-h-[calc(100vh-80px)] bg-gradient-to-br from-green-100 via-blue-100 to-purple-100 flex flex-col items-center justify-center text-center px-4 py-8 sm:py-16 overflow-hidden">
       {/* Elementos de fondo decorativos (opcional, para un toque visual) */}
-      <div className="absolute top-0 left-0 w-48 h-48 bg-green-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
-      <div className="absolute top-0 right-0 w-48 h-48 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
-      <div className="absolute bottom-0 left-1/4 w-48 h-48 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
+      <div className="absolute top-0 left-0 w-32 h-32 sm:w-48 sm:h-48 bg-green-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+      <div className="absolute top-0 right-0 w-32 h-32 sm:w-48 sm:h-48 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+      <div className="absolute bottom-0 left-1/4 w-32 h-32 sm:w-48 sm:h-48 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
 
       <div className="relative z-10 max-w-4xl mx-auto">
-        <h1 className="text-7xl font-extrabold text-gray-900 mb-6 leading-tight animate-fade-in-up">
+        <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold text-gray-900 mb-4 sm:mb-6 leading-tight animate-fade-in-up">
           SmartDietAI <span className="text-green-600">🍽️</span>
         </h1>
-        <p className="text-2xl text-gray-700 max-w-2xl mx-auto mb-10 animate-fade-in-up animation-delay-500">
+        <p className="text-base sm:text-lg md:text-2xl text-gray-700 max-w-2xl mx-auto mb-8 sm:mb-10 animate-fade-in-up animation-delay-500">
           Tu asistente de nutrición personal impulsado por IA. Escanea tu comida y obtén un análisis completo de calorías y macronutrientes al instante.
         </p>
 
         {status === "authenticated" ? (
           <Link
             href="/dashboard"
-            className="inline-block bg-green-600 text-white text-xl font-bold px-10 py-4 rounded-full shadow-lg hover:bg-green-700 transition-all duration-300 transform hover:scale-105 animate-fade-in-up animation-delay-1000"
+            className="inline-block bg-green-600 text-white text-lg sm:text-xl font-bold px-8 py-3 sm:px-10 sm:py-4 rounded-full shadow-lg hover:bg-green-700 transition-all duration-300 transform hover:scale-105 animate-fade-in-up animation-delay-1000"
           >
             Ir a tu Dashboard
           </Link>
         ) : (
-          <div className="mt-8 flex flex-col sm:flex-row gap-6 justify-center animate-fade-in-up animation-delay-1000">
+          <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center animate-fade-in-up animation-delay-1000">
             <Link
               href="/auth/register"
-              className="bg-green-600 text-white text-xl font-bold px-8 py-4 rounded-full shadow-lg hover:bg-green-700 transition-all duration-300 transform hover:scale-105"
+              className="bg-green-600 text-white text-lg sm:text-xl font-bold px-6 py-3 sm:px-8 sm:py-4 rounded-full shadow-lg hover:bg-green-700 transition-all duration-300 transform hover:scale-105"
             >
               ¡Empieza Gratis!
             </Link>
             <Link
               href="/api/auth/signin?callbackUrl=/dashboard"
-              className="border-2 border-green-600 text-green-700 text-xl font-bold px-8 py-4 rounded-full shadow-lg hover:bg-green-50 transition-all duration-300 transform hover:scale-105"
+              className="border-2 border-green-600 text-green-700 text-lg sm:text-xl font-bold px-6 py-3 sm:px-8 sm:py-4 rounded-full shadow-lg hover:bg-green-50 transition-all duration-300 transform hover:scale-105"
             >
               Iniciar Sesión
             </Link>
